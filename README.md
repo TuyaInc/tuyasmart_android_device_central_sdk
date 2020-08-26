@@ -1,3 +1,5 @@
+# Android 设备 SDK
+
 ## 功能概述
 
 Android 设备 SDK 是一套融合了网关、日志系统、语音功能以及 ota 升级等功能的开发套件，开发者可以基于该 sdk 实现入网、语音控制、固件和 apk 升级等操作。
@@ -37,21 +39,30 @@ Android 设备 SDK 主要提供：
 
 > [!warning]
 >
-> 在集成 **Android 设备 SDK** 前，请确保已经完成了 **[Tuya Home SDK 的集成](https://tuyainc.github.io/tuyasmart_home_android_sdk_doc/zh-hans/resource/Integrated.html)** 以及基础功能的开发
+> 在集成 **Android 设备 SDK** 前，请确保已经完成了 **[Tuya Home SDK 的集成](../Integrated.md)** 以及基础功能的开发
 >
 > 如：扫码登录、家庭管理等基础部分
 
 1. 配置 build.gradle 文件
    app 的 build.gradle 文件dependencies 里添加依赖库。
    
+   **libgateway 最新版本：**<img src="https://api.bintray.com/packages/tuyainc/TuyaSmartHome/tuyasmart-libgateway/images/download.svg"/>
+   
+   **libtestsuit 最新版本：**<img src="https://api.bintray.com/packages/tuyainc/TuyaSmartHome/tuyasmart-libtestsuit/images/download.svg"/>
+   
+   **aispeech 最新版本：**<img src="https://api.bintray.com/packages/tuyainc/TuyaSmartHome/tuyasmart-aispeech/images/download.svg"/>
+   
    ```groovy
-   implementation 'com.tuya.smart:tuyasmart-libgateway:1.0.3-hrs'
-   implementation 'com.tuya.smart:tuyasmart-libtestsuit:1.0.1'
+   implementation 'com.tuya.smart:tuyasmart-libgateway:x.x.x'
+   implementation 'com.tuya.smart:tuyasmart-libtestsuit:x.x.x'
+   implementation 'com.tuya.smart:tuyasmart-speech:x.x.x'
    ```
 2. 根目录下 build.gradle 文件添加 maven 源:
   
    ```groovy
-   maven {url 'https://dl.bintray.com/tuyainc/TuyaSmartHome/'}
+   maven {
+   		url "https://dl.bintray.com/tuyainc/TuyaSmartHome/"
+   }
    ```
 
 
@@ -106,9 +117,6 @@ mIotGateway.setGatewayListener(new TuyaIotGateway.GatewayListener() {
     public void onCloudMedia(TuyaIotGateway.MediaAttribute[] mediaAttributes) {
 
     }
-    
-    @Override
-    public void onCloudCustom(String type, String msgJson) {}
 
     @Override
     public String onGetIP() {
@@ -256,48 +264,6 @@ public int tuyaIotReportDataPointRawSync(String devId, int dataPointId, byte[] d
 
 在调用 tuyaIotStart 之前应该注册 TuyaIotGateway.GatewayListener 回调函数，以接收处理结果。
 
-#### 云端多媒体数据回调
-
-**接口说明**
-
-接收云端下发多媒体数据结构体，获取音频需要通过地址和参数请求音频数据流。
-
-```java
-void onCloudMedia(TuyaIotGateway.MediaAttribute[] mediaAttributes);
-
-
-class TuyaIotGateway.MediaAttribute {
-	public int mMediaType; //MEDIA_TYPE_MEDIA = 0 多媒体类型; MEDIA_TYPE_TTS = 1 TTS类型;MEDIA_TYPE_INVALD = 2 无效类型;
-	public String mUrl; //音频数据请求地址
-	public String mRequestBody; //音频数据请求参数
-}
-```
-
-**参数说明**
-
-| 返回值 | 含义                                                         |
-| ------ | ------------------------------------------------------------ |
-| mediaAttributes | 多媒体结构体 |
-
-
-#### 云端定制数据回调
-
-**接口说明**
-
-客户定制501透传接口函数，具体协议内容由云端与客户制定，并提供说明。
-
-```java
-void onCloudCustom(String type, String msgJson);
-```
-
-**参数说明**
-
-| 返回值 | 含义                                                         |
-| ------ | ------------------------------------------------------------ |
-| type | 接口类型 |
-| msgJson | 数据json |
-
-
 #### 网关状态回调
 
 **接口说明**
@@ -402,7 +368,6 @@ String onGetMacAddress();
 
 #### 网关启动结果回调
 
-
 **接口说明**
 
 tuyaIotStart 成功时调用 onStartSuccess 回调。
@@ -424,6 +389,7 @@ void onStartFailure(int err);
 | 返回值 | 含义                                                         |
 | ------ | ------------------------------------------------------------ |
 | type   | 错误码，为 GatewayError 中定义的值之一，常见错误：<br>ERROR_COM_ERROR：网络连接错误<br>ERROR_INVALID_PARM：参数错误<br>ERROR_INVALID_STATUS：状态错误 |
+
 
 
 #### 获取日志文件
@@ -611,104 +577,141 @@ libtestsuit 是封装的 zigBee 测试库，主要给产测工具用，调用方
 4. 在回调函数中检测测试结果，ZigbeeTestSuit.TEST_OK 为测试通过，其它为错误值 ZigbeeTestSuit.TEST_* 之一。
 > 参考 demo ./app/src/main/java/com/tuya/smart/android/demo/test/ZigbeeTest.java中的调用方式。
 
-## 语音相关
-### 控制状态定义
-```java
-TuyaIotGateway.VoiceControl.VOICE_MIC_OPEN = 1,		//麦克风开启
-TuyaIotGateway.VoiceControl.VOICE_MIC_CLOSE = 2, 	//麦克风关闭
-TuyaIotGateway.VoiceControl.VOICE_PLAY = 3,			//播放
-TuyaIotGateway.VoiceControl.VOICE_PAUSE = 4,			//暂停
-TuyaIotGateway.VoiceControl.VOICE_BT_PLAY_OPEN = 5,	//打开蓝牙
-TuyaIotGateway.VoiceControl.VOICE_BT_PLAY_CLOSE = 6,//关闭蓝牙
-TuyaIotGateway.VoiceControl.VOICE_PLAY_NEXT = 7,     //下一首
-TuyaIotGateway.VoiceControl.VOICE_PLAY_PREV = 8,		//上一首
+## 语音助手
+
+> 该功能需要是没有语音前端处理能力的情况下接入的功能，如果已经有语音前端处理的能力，可以跳过该章节直接查看[语音通道接口](#语音通道接口)。如果需要对接该能力，需要协调涂鸦项目经理申请配置。
+
+### 产品配置
+将涂鸦提供的资源文件和配置文件放置到设备存储的同一目录下。
+
+**配置示例**   
+config.json
+### 开启
+通过 TuyaIotGateway 单例开启语音服务, 开启成功后可通过关键词唤醒，唤醒后可接收语音命令。
+
+```json
+{
+	"PRODUCT_ID": "产品ID",
+	"USER_ID": "用户ID",
+	"PRODUCT_KEY": "Product Key",
+	"PRODUCT_SECRET": "Product Secret",
+	"API_KEY": "产品授权秘钥，服务端生成"
+}
 ```
 
-### 语音控制初始化
+### 初始化
+创建SpeechHelper对象
 
 **接口说明** 
 
 ```java
-void setVoiceCapableCallback(VoiceCapableCallback callback)
+SpeechHelper(Context context, String configPath, final OnSpeechCallback callback, int commandTimeout)
 ```
 **参数说明**
 
 | 参数 |说明  |
 | --- | --- |
-| callback | 语音能力回调|
+| context | 上下文|
+| configPath | 资源及配置存放路径|
+| callback | 语音助手事件回调|
+| commandTimeout | 语音命令超时时间|
 
 **示例代码**
 
-```java
-TuyaIotGateway.getInstance().setVoiceCapableCallback(new VoiceCapableCallback() {
+```kotlin
+helper = SpeechHelper(this, "/sdcard/tuya_speech_config/", object : OnSpeechCallback {
 
-		void onVolume(int volume) {
-			 TODO("音量变化回调：volume 音量")
-		}
-		
-		void onControl(int control) {
-			 TODO("媒体控制回调: control 媒体控制状态")
-		}
-		
-		void onAlarm(String alarm) {
-			 TODO("闹钟回调: alarm 闹钟名称")
-		}
-	
-	}
-)
+            override fun onDeInitComplete() {
+                TODO("语音助手关闭成功")
+            }
+
+            override fun onInitComplete() {
+                TODO("语音助手开启成功")
+            }
+
+            override fun onDeInitError(errMsg: String) {
+                TODO("语音助手关闭报错：errMsg 错误信息")
+            }
+
+            override fun onCommand(command: String, data: String) {
+                TODO("收到离线命令： command 命令名称；data：命令数据")
+            }
+
+            override fun getCommands(): Array<String> {
+                TODO("离线命令注册")
+            }
+
+            override fun onInitError(errMsg: String) {
+                TODO("开启失败：errMsg 错误信息")
+            }
+
+            override fun onASRError(errMsg: String) {
+                TODO("识别错误：errMsg 错误信息")
+            }
+
+            override fun onPermissionDenied() {
+                TODO("权限不足")
+            }
+
+            override fun onStartListening() {
+                TODO("正在聆听语音")
+            }
+
+            override fun onWakeup(): Boolean {
+                TODO("是否拦截唤醒后的操作：true 拦截 false不拦截；使用场景，根据需求动态控制语音响应，开启拦截语音唤醒后无响应")
+            }
+
+            override fun onSpeechBeginning() {
+                TODO("用户正在说话")
+            }
+
+            override fun onSpeechEnd(errCode: Int) {
+                TODO("用户说话结束")
+            }
+
+            override fun onResponse(success: Boolean, audioPath: ArrayList<String>) {
+                TODO("收到云端回复： success 是否成功回复；audioPath 回复音频文件的路径")
+            }
+        }, 8000)
 ```
 
-### 音量上报
+### 绑定
+SpeechHelper 与中控 SDK 通过接口绑定，打通语音上传云端逻辑。
 
 **接口说明** 
 
-DP上报音量值，在音量改变的情况下，调用此接口。
-
 ```java
-int voiceCapableReportVol(int volume)
+void setSpeechHandler(Handler speechHandler)
 ```
+**参数说明**
 
-**参数**
-
-| 参数名 | 描述   |
-| ------ | ------ |
-| volume    | 音量值 |
-
-**返回值**
-
-0 : 成功； 其他：失败错误码
+| 参数 |说明  |
+| --- | --- |
+| speechHandler | Handler|
 
 **示例代码**
 
-```java
-TuyaIotGateway.getInstance().voiceCapableReportVol(0)
+```kotlin
+TuyaIotGateway.getInstance().setSpeechHandler(helper?.getHandler())
 ```
 
-### 媒体控制上报
-
-**接口说明** 
-
-DP上报媒体控制状态，在媒体控制状态改变的情况下，调用此接口。
+### 开启
+开启语音服务, 开启成功后可通过关键词唤醒，唤醒后可接收语音命令。
 
 ```java
-int voiceCapableReportCtl(int control)
+void start()
 ```
 
-**参数**
-
-| 参数名 | 描述   |
-| ------ | ------ |
-| control    | 媒体控制状态 |
-
-**返回值**
-
-0 : 成功； 其他：失败错误码
-
-**示例代码**
+### 关闭
+关闭语音服务， 进入不可唤醒状态。
 
 ```java
-TuyaIotGateway.getInstance().voiceCapableReportCtl(TuyaIotGateway.VoiceControl.VOICE_PLAY);
+void stop()
 ```
+
+> 可参考 demo 中的` SpeechTestActivity`
+
+## 语音通道接口
 
 ### 语音上报接口
 **接口说明** 
@@ -728,49 +731,21 @@ TuyaIotGateway.getInstance().tuyaIotUploadMedia(byte[] buffer);
 TuyaIotGateway.getInstance().tuyaIotUploadMediaStop();
 ```
 
-### 语音服务接口
-**接口说明** 
+### 语音回复数据接收
 
-设置多媒体数据以及定制数据接收回调，参考 [回调函数](#回调函数) 中的说明。
+**接口说明**
 
-**示例代码**
-
-```java
-TuyaIotGateway.getInstance().setGatewayListener(new TuyaIotGateway.GatewayListener() {
-		
-		···
-		
-		void onCloudMedia(TuyaIotGateway.MediaAttribute[] medias) {
-			 TODO("接收云端下发tts报文。")
-		}
-		
-		void onCloudCustom(String type, String msgJson) {
-			 TODO("客户定制501透传接口函数，具体协议内容由云端与客户制定，并提供说明。")
-		}
-	}
-)
-```
-
-#### ATOP透传接口
-**接口说明** 
+接收云端下发多媒体数据结构体，获取音频需要通过地址和参数请求音频数据流。
 
 ```java
-int atopPost(String postData);
-```
-**参数说明**
+void onCloudMedia(TuyaIotGateway.MediaAttribute[] mediaAttributes);
 
-| 参数 |说明  |
-| --- | --- |
-| postData | 上报云端的数据json字符串|
 
-| 返回值    | 含义                                                         |
-| --------- | ------------------------------------------------------------ |
-| 错误码      | 0 : 成功； 其他：失败错误码 |
-
-**示例代码**
-
-```java
-TuyaIotGateway.getInstance().atopPost("");
+class TuyaIotGateway.MediaAttribute {
+	public int mMediaType; //MEDIA_TYPE_MEDIA = 0 多媒体类型; MEDIA_TYPE_TTS = 1 TTS类型;MEDIA_TYPE_INVALD = 2 无效类型;
+	public String mUrl; //音频数据请求地址
+	public String mRequestBody; //音频数据请求参数
+}
 ```
 
 ## OTA 升级
