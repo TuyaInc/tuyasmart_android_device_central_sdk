@@ -39,7 +39,7 @@ Android 设备 SDK 主要提供：
 
 > [!warning]
 >
-> 在集成 **Android 设备 SDK** 前，请确保已经完成了 **[Tuya Home SDK 的集成](../Integrated.md)** 以及基础功能的开发
+> 在集成 **Android 设备 SDK** 前，请确保已经完成了 **[Tuya Home SDK 的集成](https://tuyainc.github.io/tuyasmart_home_android_sdk_doc/zh-hans/resource/Integrated.html)** 以及基础功能的开发
 >
 > 如：扫码登录、家庭管理等基础部分
 
