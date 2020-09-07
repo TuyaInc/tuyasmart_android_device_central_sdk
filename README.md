@@ -48,10 +48,10 @@ Android 设备 SDK 主要提供：
    implementation 'com.tuya.smart:tuyasmart-libgateway:1.0.3-hrs'
    implementation 'com.tuya.smart:tuyasmart-libtestsuit:1.0.1'
    ```
-2. 根目录下 build.gradle 文件添加 maven 源:
+2. 根目录下 build.gradle 文件添加源:
   
    ```groovy
-   maven {url 'https://dl.bintray.com/tuyainc/TuyaSmartHome/'}
+   jcenter()
    ```
 
 
