@@ -39,7 +39,7 @@ Android 设备 SDK 主要提供：
 
 > [!warning]
 >
-> 在集成 **Android 设备 SDK** 前，请确保已经完成了 **[Tuya Home SDK 的集成](../Integrated.md)** 以及基础功能的开发
+> 在集成 **Android 设备 SDK** 前，请确保已经完成了 **[Tuya Home SDK 的集成](https://tuyainc.github.io/tuyasmart_home_android_sdk_doc/zh-hans/resource/Integrated.html)** 以及基础功能的开发
 >
 > 如：扫码登录、家庭管理等基础部分
 
@@ -165,16 +165,16 @@ TuyaIotGateway.Config
 
 | 成员         | 说明                                                         |
 | ------------ | ------------------------------------------------------------ |
-| mPath        | 存储路径，该目录要在 app 中创建                              |
-| mFirmwareKey | 固件，向涂鸦申请，产品唯一                                   |
+| mPath        | 存储路径，该目录要在app中创建                                |
+| mFirmwareKey | 固件key或者pid，向涂鸦申请，产品唯一。<br/>和mIsOEM配合使用:<br/>mIsOEM为true时，mFirmwareKey为固件key<br/>mIsOEM为false时，mFirmwareKey为pid |
 | mUUID        | 设备唯一，成对出现                                           |
-| mAuthKey     | authkey，向涂鸦申请，设备唯一，和 mUUID 成对出现             |
-| mVersion     | 版本号，用于标识 app 版本，而不是网关版本                    |
+| mAuthKey     | authkey，向涂鸦申请，设备唯一，和mUUID成对出现               |
+| mVersion     | 版本号，用于标识app 版本，而不是网关版本                     |
 | mSerialPort  | 串口终端                                                     |
-| mTempDir     | 临时文件目录，该目录要在 app 中创建                          |
-| mBinDir      | bin 文件目录，该文件夹下不要存放其他文件，该目录要在 app 中创建 |
+| mTempDir     | 临时文件目录，该目录要在app中创建                            |
+| mBinDir      | bin文件目录，该文件夹下不要存放其他文件，该目录要在app中创建 |
 | mIsCTS       | 是否带流控                                                   |
-| mIsOEM       | 是否是 oem 产品，只支持 true。                               |
+| mIsOEM       | 是否是oem产品，和mFirmwareKey配合使用。                                  |
 
 **返回值说明**
 
