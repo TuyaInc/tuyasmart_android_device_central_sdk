@@ -21,7 +21,7 @@ Android 设备 SDK 是一套融合了网关、日志系统、语音功能以及 
 
 ## SDK 能力
 
-<img src="https://tuyainc.github.io/tuyasmart_home_android_sdk_doc/zh-hans/resource/centrol_control/images/center_control_fuction.png" alt="image-20200706114130343" style="zoom:50%;" />
+<img src="./assets/center_control_fuction.png" alt="image-20200706114130343" style="zoom:50%;" />
 
 Android 设备 SDK 主要提供：
 
