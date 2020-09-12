@@ -46,7 +46,7 @@ Android 设备 SDK 主要提供：
 1. 配置 build.gradle 文件
    app 的 build.gradle 文件dependencies 里添加依赖库。
    
-   **libgateway 最新版本：1.1.7**
+   **libgateway 最新版本：1.1.8**
    
    **libtestsuit 最新版本：**<img src="https://api.bintray.com/packages/tuyainc/TuyaSmartHome/tuyasmart-libtestsuit/images/download.svg"/>
    
