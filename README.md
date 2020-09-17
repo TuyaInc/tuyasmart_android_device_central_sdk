@@ -45,7 +45,7 @@ Android 设备 SDK 主要提供：
    app 的 build.gradle 文件dependencies 里添加依赖库。
    
    ```groovy
-   implementation 'com.tuya.smart:tuyasmart-libgateway:1.0.4-hrs'
+   implementation 'com.tuya.smart:tuyasmart-libgateway:1.0.6-hrs'
    implementation 'com.tuya.smart:tuyasmart-libtestsuit:1.0.1'
    ```
 2. 根目录下 build.gradle 文件添加源:
@@ -755,22 +755,27 @@ TuyaIotGateway.getInstance().setGatewayListener(new TuyaIotGateway.GatewayListen
 **接口说明** 
 
 ```java
-int atopPost(String postData);
+ATopResponse atopPost(String api, String version, String postData);
 ```
 **参数说明**
 
 | 参数 |说明  |
 | --- | --- |
+| api | 接口名|
+| version | 接口版本|
 | postData | 上报云端的数据json字符串|
 
 | 返回值    | 含义                                                         |
 | --------- | ------------------------------------------------------------ |
-| 错误码      | 0 : 成功； 其他：失败错误码 |
+| ATopResponse      | 包含errCode（错误码）和result（请求结果）两个字段。请求正常返回时errCode为0 |
 
 **示例代码**
 
 ```java
-TuyaIotGateway.getInstance().atopPost("");
+ATopResponse response = TuyaIotGateway.getInstance().atopPost("tuya.xx.xx", "1.0", "");
+if (response.errCode == 0) {
+	Log.d(TAG, "result: " + response.result);
+}
 ```
 
 ## OTA 升级
