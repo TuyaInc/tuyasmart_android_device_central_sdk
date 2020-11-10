@@ -46,7 +46,7 @@ Android 设备 SDK 主要提供：
 1. 配置 build.gradle 文件
    app 的 build.gradle 文件dependencies 里添加依赖库。
    
-   **libgateway 最新版本：1.1.8**
+   **libgateway 最新版本：1.1.9.1**
    
    **libtestsuit 最新版本：**<img src="https://api.bintray.com/packages/tuyainc/TuyaSmartHome/tuyasmart-libtestsuit/images/download.svg"/>
    
@@ -55,8 +55,13 @@ Android 设备 SDK 主要提供：
    ```groovy
    implementation 'com.tuya.smart:tuyasmart-libgateway:x.x.x'
    implementation 'com.tuya.smart:tuyasmart-libtestsuit:x.x.x'
+   
+   //如需接入语音功能，添加以下依赖。
+   implementation(name: 'lib-dds-1.2.8.1-release', ext: 'aar')
    implementation 'com.tuya.smart:tuyasmart-speech:x.x.x'
    ```
+   注意：语音库文件（lib-dds-xx-release.aar）需要前往思必驰官网下并载添加到你的工程（[如何下载以及导入看这里](https://www.duiopen.com/docs/ct_common_Andriod_SDK)）
+   
 2. 根目录下 build.gradle 文件添加源:
   
    ```groovy
