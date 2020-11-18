@@ -45,7 +45,7 @@ Android 设备 SDK 主要提供：
    app 的 build.gradle 文件dependencies 里添加依赖库。
    
    ```groovy
-   implementation 'com.tuya.smart:tuyasmart-libgateway:1.0.7-hrs'
+   implementation 'com.tuya.smart:tuyasmart-libgateway:1.0.8-hrs'
    implementation 'com.tuya.smart:tuyasmart-libtestsuit:1.0.1'
    ```
 2. 根目录下 build.gradle 文件添加源:
