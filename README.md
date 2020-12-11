@@ -45,7 +45,7 @@ Android 设备 SDK 主要提供：
    app 的 build.gradle 文件dependencies 里添加依赖库。
    
    ```groovy
-   implementation 'com.tuya.smart:tuyasmart-libgateway:1.0.8-hrs'
+   implementation 'com.tuya.smart:tuyasmart-libgateway:1.1.8-aispeaker'
    implementation 'com.tuya.smart:tuyasmart-libtestsuit:1.0.1'
    ```
 2. 根目录下 build.gradle 文件添加源:
@@ -162,10 +162,6 @@ TuyaIotGateway.Config
 | mUUID        | 设备唯一，成对出现                                           |
 | mAuthKey     | authkey，向涂鸦申请，设备唯一，和mUUID成对出现               |
 | mVersion     | 版本号，用于标识app 版本，而不是网关版本                     |
-| mSerialPort  | 串口终端                                                     |
-| mTempDir     | 临时文件目录，该目录要在app中创建                            |
-| mBinDir      | bin文件目录，该文件夹下不要存放其他文件，该目录要在app中创建 |
-| mIsCTS       | 是否带流控                                                   |
 | mIsOEM       | 是否是oem产品，和mFirmwareKey配合使用。                                  |
 
 **返回值说明**
