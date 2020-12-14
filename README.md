@@ -717,7 +717,7 @@ TuyaIotGateway.getInstance().voiceCapableReportCtl(TuyaIotGateway.VoiceControl.V
 //开启上传;返回值：0(成功)；其他(失败错误码)
 TuyaIotGateway.getInstance().tuyaIotUploadMediaStart();
 
-//上传语音数据；参数buffer 音频数据;返回值：0(成功)；其他(失败错误码)
+//上传语音数据；参数buffer 音频数据;返回值：0(成功)；其他(失败错误码),格式PCM，采样率8000，16bit，单通道
 TuyaIotGateway.getInstance().tuyaIotUploadMedia(byte[] buffer);
 
 //结束上传;返回值：0(成功)；其他(失败错误码)
