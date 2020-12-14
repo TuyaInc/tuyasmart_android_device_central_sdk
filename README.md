@@ -29,8 +29,7 @@ Android 设备 SDK 主要提供：
 | -------- | ----------------------------------------------------------- |
 | 网关     | 如网关的启动、入网、获取设备虚拟 id、DP 点 下发/上报 功能。 |
 | 日志系统 | 日志的获取保存等                                            |
-| 测试套件 | zigBee 测试库                                               |
-| 语音功能 |                                                             |
+| 语音功能 |   语音唤醒、前端采集、上报	|
 | OTA 功能 |                                                            |
 
 其他能力：如用户管理、家庭管理、场景等操作需要基于 Tuya Home SDK 完成。
@@ -46,32 +45,34 @@ Android 设备 SDK 主要提供：
 1. 配置 build.gradle 文件
    app 的 build.gradle 文件dependencies 里添加依赖库。
    
-   **libgateway 最新版本：1.2.0**
-   
-   **libtestsuit 最新版本：**<img src="https://api.bintray.com/packages/tuyainc/TuyaSmartHome/tuyasmart-libtestsuit/images/download.svg"/>
-   
-   **aispeech 最新版本：**<img src="https://api.bintray.com/packages/tuyainc/TuyaSmartHome/tuyasmart-aispeech/images/download.svg"/>
+   **中控SDK 最新版本：**<img src="https://api.bintray.com/packages/tuyasmartai/sdk/tuyasmart-lego_sdk_CENTRAL/images/download.svg"/>
    
    ```groovy
-   implementation 'com.tuya.smart:tuyasmart-libgateway:x.x.x'
-   implementation 'com.tuya.smart:tuyasmart-libtestsuit:x.x.x'
-   
-   //如需接入语音功能，添加以下依赖。
-   implementation(name: 'lib-dds-1.2.8.1-release', ext: 'aar')
-   implementation 'com.tuya.smart:tuyasmart-aispeech:x.x.x'
+   implementation 'com.tuya.smart:tuyasmart-lego_sdk_CENTRAL:x.x.x'
    ```
-   注意：语音库文件（lib-dds-xx-release.aar）需要前往思必驰官网下载并添加到你的工程（[如何下载以及导入看这里的“手动集成部分”](https://www.duiopen.com/docs/ct_common_Andriod_SDK)）
+   
+   **使用到的三方依赖**
+   
+   ```groovy
+	implementation 'org.apache.commons:commons-io:1.3.2'
+    implementation 'org.jetbrains.kotlin:kotlin-android-extensions-runtime:1.3.61'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.alibaba:fastjson:1.1.67.android'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.8'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
+    implementation 'pub.devrel:easypermissions:2.0.1'
+   ```
    
 2. 根目录下 build.gradle 文件添加源:
   
    ```groovy
    jcenter()
+   maven { url 'https://dl.bintray.com/tuyasmartai/sdk' }
    ```
-
 
 ## 网关控制
 
-网关控制实现了启动、入网、获取设备虚拟 id、DP 点 下发/上报 功能。
+网关控制实现了启动、入网。
 
 ### 网关启动
 
@@ -80,71 +81,40 @@ Android 设备 SDK 主要提供：
 **接口说明**
 
 ```java
-mIotGateway = TuyaIotGateway.getInstance();
+mGateway = TuyaGatewaySdk.getInstance();
 ```
 
 #### 注册回调函数
 
-创建`TuyaIotGateway.GatewayListener `对象， 调用` TuyaIotGateway` 的 `setGatewayListener`函数注册。回调函数的实现参考[回调函数](#回调函数)中说明。
+创建`GatewayCallbacks `对象， 调用` TuyaGatewaySdk` 的 `setGatewayCallbacks`函数注册。回调函数的实现参考[回调函数](#回调函数)中说明。
 
 **接口说明**
 
 ```java
-mIotGateway.setGatewayListener(new TuyaIotGateway.GatewayListener() {
-    @Override
-    public void onStatusChanged(int status) {
+mIotGateway.setGatewayCallbacks(new GatewayCallbacks() {
+    void onStatusChanged(int status);
 
-    }
+    void onReset(int type);
 
-    @Override
-    public void onReset(int type) {
+    void onReboot();
 
-    }
+    void onDataPointCommand(int type, int dttType, String cid, String groupid, DataPoint[] dataPoint);
 
-    @Override
-    public void onReboot() {
+    void onNetworkStatus(int status);
 
-    }
+    String onGetIP();
 
-    @Override
-    public void onDataPointCommand(int type, int dttType, String cid, String groupid, TuyaIotGateway.DataPoint[] dataPoint) {
+    void onStartSuccess();
 
-    }
+    void onStartFailure(int err);
 
-    @Override
-    public void onNetworkStatus(int status) {
+    String onGetLogFile();
 
-    }
+    String onGetMacAddress();
 
-    @Override
-    public void onCloudMedia(TuyaIotGateway.MediaAttribute[] mediaAttributes) {
+    void onZigbeeServiceDied();
 
-    }
-
-    @Override
-    public String onGetIP() {
-        return null;
-    }
-
-    @Override
-    public void onStartSuccess() {
-
-    }
-
-    @Override
-    public void onStartFailure(int err) {
-
-    }
-
-    @Override
-    public String onGetLogFile() {
-        return null;
-    }
-
-    @Override
-    public String onGetMacAddress() {
-        return null;
-    }
+    void onZigbeeError();
 });
 ```
 
@@ -153,7 +123,7 @@ mIotGateway.setGatewayListener(new TuyaIotGateway.GatewayListener() {
 **接口说明**
 
 ```java
-void tuyaIotStart(Context context, Config config);
+void gatewayStart(Context context, GatewayConfig config);
 ```
 
 **参数说明**
@@ -161,9 +131,9 @@ void tuyaIotStart(Context context, Config config);
 | 参数    | 说明                                 |
 | ------- | ------------------------------------ |
 | Context | 上下文                               |
-| Config  | 网关配置，参看 TuyaIotGateway.Config |
+| GatewayConfig  | 网关配置 |
 
-TuyaIotGateway.Config
+GatewayConfig.class
 
 
 | 成员         | 说明                                                         |
@@ -177,7 +147,7 @@ TuyaIotGateway.Config
 | mTempDir     | 临时文件目录，该目录要在app中创建                         |
 | mBinDir      | bin文件目录，该文件夹下不要存放其他文件，该目录要在app中创建 |
 | mIsCTS       | 是否带流控                                                 |
-| mIsOEM       | 是否是oem产品，和mFirmwareKey配合使用。                                  |
+| mIsOEM       | 是否是oem产品，和mFirmwareKey配合使用。           |                      
 
 **返回值说明**
 
@@ -190,7 +160,7 @@ tuyaIotStart 是异步调用，其结果通过回调函数返回，启动成功�
 **接口说明**
 
 ```java
-public int tuyaIotBindToken(String token);
+public int gatewayBindToken(String token);
 ```
 
 **参数说明**
@@ -208,64 +178,10 @@ public int tuyaIotBindToken(String token);
 
 
 
-### 获取设备虚拟 ID
-
-入网成功后，可以获取设备虚拟 ID。
-
-**接口说明**
-
-```java
-public String tuyaIotGetId();
-```
-
-### DP 点上报
-
-#### 异步上报
-
-**接口说明**
-
-同步上传透传型 DP 点数据。
-
-```java
-public int tuyaIotReportDataPointJsonAsync(String devId, DataPoint[] dataPoint);
-```
-
-**参数说明**
-
-| 参数      | 说明                                                         |
-| --------- | ------------------------------------------------------------ |
-| devId     | 如果是主设备，devId 是自设备 id；如果是网关 /soc/mcu，则 devId 为 null |
-| dataPoint | dp 点信息，参考 TuyaIotGateway.DataPoint                     |
-
-TuyaIotGateway.DataPoint
-
-| 成员       | 说明                                                         |
-| ---------- | ------------------------------------------------------------ |
-| mId        | 在涂鸦 IoT 平台上定义的功能点编号                            |
-| mType      | 功能点的数据类型，支持的数据类型请参见涂鸦文档中心的功能点定义，参考[自定义功能](https://docs.tuya.com/zh/iot/configure-in-platform/function-definition/custom-functions?id=K937y38137c64):<br>TYPE_BOOL：布尔型<br>TYPE_VALUE：数值型<br>TYPE_STRING：字符串型<br>TYPE_ENUM：枚举型<br>TYPE_BITMAP：故障型<br> |
-| mData      | 功能点的值，数据类型由 mType 指定。                          |
-| mTimeStamp | 时间戳，值为 0 时采用当前的时间。                            |
-
-#### 同步上报
-
-**接口说明**
-
-```java
-public int tuyaIotReportDataPointRawSync(String devId, int dataPointId, byte[] data, int timeout);
-```
-
-**参数说明**
-
-| 返回值      | 含义                                                         |
-| ----------- | ------------------------------------------------------------ |
-| devId       | 如果是主设备，devId 是自设备 id；如果是网关 /soc/mcu，则 devId 为 null |
-| dataPointId | 在涂鸦 IoT 平台上定义的功能点编号                            |
-| data        | 透传型 dp 点数据                                             |
-| timeout     | 函数阻塞超时时间，以秒为单位                                 |
 
 ### 回调函数
 
-在调用 tuyaIotStart 之前应该注册 TuyaIotGateway.GatewayListener 回调函数，以接收处理结果。
+在调用 gatewayStart 之前应该注册 GatewayCallbacks 回调函数，以接收处理结果。
 
 #### 网关状态回调
 
@@ -394,7 +310,6 @@ void onStartFailure(int err);
 | type   | 错误码，为 GatewayError 中定义的值之一，常见错误：<br>ERROR_COM_ERROR：网络连接错误<br>ERROR_INVALID_PARM：参数错误<br>ERROR_INVALID_STATUS：状态错误 |
 
 
-
 #### 获取日志文件
 
 **接口说明**
@@ -420,27 +335,73 @@ public String onGetLogFile() {
 
 
 
-### 网关控制流程
 
-```sequence
-participant APP
-participant Gateway
-APP->Gateway:getInstance
-APP->Gateway:setGatewayListener
-APP->Gateway:tuyaIotStart
-Gateway-->APP:onStartSuccess
-APP->Gateway:tuyaIotBindToken
-Gateway-->APP:onStatusChanged
-Gateway-->APP:onNetworkStatus
+## IoT相关接口
 
-Gateway-->APP:onReboot
-APP->APP:reboot
+获取设备虚拟 id、DP 点 下发/上报 等功能。
 
-Gateway-->APP:onReset
-Note right of APP:如果 onReset 回调非RESET_TYPE_RESET_DATA_FACTORY，则reboot
-APP->APP:reboot
+#### 获取IoT SDK 实例
 
+**接口说明**
+
+```java
+mIot = TuyaIotSdk.getInstance();
 ```
+
+### 获取设备虚拟 ID
+
+入网成功后，可以获取设备虚拟 ID。
+
+**接口说明**
+
+```java
+TuyaIotSdk.getInstance().getId();
+```
+
+### DP 点上报
+
+#### 异步上报
+
+**接口说明**
+
+同步上传透传型 DP 点数据。
+
+```java
+public int tuyaIotReportDataPointJsonAsync(String devId, DataPoint[] dataPoint);
+```
+
+**参数说明**
+
+| 参数      | 说明                                                         |
+| --------- | ------------------------------------------------------------ |
+| devId     | 如果是主设备，devId 是自设备 id；如果是网关 /soc/mcu，则 devId 为 null |
+| dataPoint | dp 点信息，参考 TuyaGatewaySdk.DataPoint                     |
+
+TuyaGatewaySdk.DataPoint
+
+| 成员       | 说明                                                         |
+| ---------- | ------------------------------------------------------------ |
+| mId        | 在涂鸦 IoT 平台上定义的功能点编号                            |
+| mType      | 功能点的数据类型，支持的数据类型请参见涂鸦文档中心的功能点定义，参考[自定义功能](https://docs.tuya.com/zh/iot/configure-in-platform/function-definition/custom-functions?id=K937y38137c64):<br>TYPE_BOOL：布尔型<br>TYPE_VALUE：数值型<br>TYPE_STRING：字符串型<br>TYPE_ENUM：枚举型<br>TYPE_BITMAP：故障型<br> |
+| mData      | 功能点的值，数据类型由 mType 指定。                          |
+| mTimeStamp | 时间戳，值为 0 时采用当前的时间。                            |
+
+#### 同步上报
+
+**接口说明**
+
+```java
+public int tuyaIotReportDataPointRawSync(String devId, int dataPointId, byte[] data, int timeout);
+```
+
+**参数说明**
+
+| 返回值      | 含义                                                         |
+| ----------- | ------------------------------------------------------------ |
+| devId       | 如果是主设备，devId 是自设备 id；如果是网关 /soc/mcu，则 devId 为 null |
+| dataPointId | 在涂鸦 IoT 平台上定义的功能点编号                            |
+| data        | 透传型 dp 点数据                                             |
+| timeout     | 函数阻塞超时时间，以秒为单位                                 |
 
 
 
@@ -485,7 +446,7 @@ public void setExpectation(int pid, String tags, boolean seperate)
 | 参数     | 说明                                                         |
 | -------- | ------------------------------------------------------------ |
 | pid      | -1：不按照进程抓取日志；正值：要抓取的进程id。               |
-| tags     | 设置要抓取的 tag，多个 tag 用英文逗号分开，例如 “TuyaIotGateway,LogDaemon”，抓取Android LOG TAG 为 TuyaIotGateway 和 LogDaemon 的日志。 |
+| tags     | 设置要抓取的 tag，多个 tag 用英文逗号分开，例如 “TuyaGatewaySdk,LogDaemon”，抓取Android LOG TAG 为 TuyaGatewaySdk 和 LogDaemon 的日志。 |
 | seperate | 如果要通过 pid 和 tag 抓取日志，seperate 指定是否分开抓取，如果分开抓取，pid 一份 log，tag 一份 log；否则抓取 pid 中指定的 tag 日志。只有 pid 和 tag 同时有效时，该参数才有意义。 |
 
 **示例代码**
@@ -501,19 +462,19 @@ public void setExpectation(int pid, String tags, boolean seperate)
 
 * 收集指定进程中符合 tag 的日志
 
-  抓取本进程中 tag 为 TuyaIotGateway 和 LogDaemon 的日志：
+  抓取本进程中 tag 为 TuyaGatewaySdk 和 LogDaemon 的日志：
 
   ```java
-  mLogDaemon.setExpectation(android.os.Process.myPid(),  "TuyaIotGateway,LogDaemon", false);
+  mLogDaemon.setExpectation(android.os.Process.myPid(),  "TuyaGatewaySdk,LogDaemon", false);
   mLogDaemon.start();
   ```
 
 * 收集指定 tag 的日志
 
-  抓取 tag 为 TuyaIotGateway和 LogDaemon 的日志：
+  抓取 tag 为 TuyaGatewaySdk和 LogDaemon 的日志：
 
   ```java
-  mLogDaemon.setExpectation(-1,  "TuyaIotGateway,LogDaemon", false);
+  mLogDaemon.setExpectation(-1,  "TuyaGatewaySdk,LogDaemon", false);
   mLogDaemon.start();
   ```
 
@@ -521,10 +482,10 @@ public void setExpectation(int pid, String tags, boolean seperate)
 
 * 收集指定 pid 的日志和指定 tag 的日志，输出两份日志
 
-  分别抓取本进程所有日志以及 tag 为 TuyaIotGateway 和 LogDaemon 的日志的日志。
+  分别抓取本进程所有日志以及 tag 为 TuyaGatewaySdk 和 LogDaemon 的日志的日志。
 
   ```java
-  mLogDaemon.setExpectation(android.os.Process.myPid(),  "TuyaIotGateway,LogDaemon", true);
+  mLogDaemon.setExpectation(android.os.Process.myPid(),  "TuyaGatewaySdk,LogDaemon", true);
   mLogDaemon.start();
   ```
 
@@ -557,28 +518,6 @@ public void stop();
 public String getZippedLogFile()；
 ```
 
-### 日志保存流程
-
-```sequence
-participant APP
-participant LogDaemon as Log
-APP->Log:new
-APP->Log:setExpectation
-APP->Log:start
-APP->Log:getZippedLogFile
-APP->Log:stop
-```
-
-
-
-## 测试套件
-
-libtestsuit 是封装的 zigBee 测试库，主要给产测工具用，调用方法：
-1. 创建 ZigbeeTestSuit.Config 对象，并按说明配置参数。这个 config 和 TuyaIotGateway.Config 基本一致。
-2. 注册回调函数 ZigbeeTestSuit.OnTestCompletion
-3. 调用 tuyaZigbeeTest 开始测试
-4. 在回调函数中检测测试结果，ZigbeeTestSuit.TEST_OK 为测试通过，其它为错误值 ZigbeeTestSuit.TEST_* 之一。
-> 参考 demo ./app/src/main/java/com/tuya/smart/android/demo/test/ZigbeeTest.java中的调用方式。
 
 ## 语音助手
 
@@ -590,7 +529,7 @@ libtestsuit 是封装的 zigBee 测试库，主要给产测工具用，调用方
 **配置示例**   
 config.json
 ### 开启
-通过 TuyaIotGateway 单例开启语音服务, 开启成功后可通过关键词唤醒，唤醒后可接收语音命令。
+通过 TuyaGatewaySdk 单例开启语音服务, 开启成功后可通过关键词唤醒，唤醒后可接收语音命令。
 
 ```json
 {
@@ -608,7 +547,7 @@ config.json
 **接口说明** 
 
 ```java
-SpeechHelper(Context context, String configPath, final OnSpeechCallback callback, int commandTimeout)
+SpeechHelper(Context context, String configPath, String audioPath, final SpeechCallback callback, int commandTimeout, String deviceId)
 ```
 **参数说明**
 
@@ -616,86 +555,89 @@ SpeechHelper(Context context, String configPath, final OnSpeechCallback callback
 | --- | --- |
 | context | 上下文|
 | configPath | 资源及配置存放路径|
+| audioPath | 音频文件存放路径|
 | callback | 语音助手事件回调|
 | commandTimeout | 语音命令超时时间|
+| deviceId | 设备id |
 
 **示例代码**
 
 ```kotlin
-helper = SpeechHelper(this, "/sdcard/tuya_speech_config/", object : OnSpeechCallback {
+helper = SpeechHelper(this, "/sdcard/tuya_speech_config/", "/sdcard/tuya_speech_audio/",object : SpeechCallback {
+	/**
+     * 启动完成
+     */
+    fun onInitComplete()
 
-            override fun onDeInitComplete() {
-                TODO("语音助手关闭成功")
-            }
+    /**
+     * 反初始化完成
+     */
+    fun onDeInitComplete()
 
-            override fun onInitComplete() {
-                TODO("语音助手开启成功")
-            }
+    /**
+     * 语音监听中
+     */
+    fun onStartListening()
 
-            override fun onDeInitError(errMsg: String) {
-                TODO("语音助手关闭报错：errMsg 错误信息")
-            }
+    /**
+     * 是否开启唤醒后监听
+     */
+    fun onWakeup(): Boolean
 
-            override fun onCommand(command: String, data: String) {
-                TODO("收到离线命令： command 命令名称；data：命令数据")
-            }
+    /**
+     * 检测到用户开始说话
+     */
+    fun onSpeechBeginning(errCode: Int)
 
-            override fun getCommands(): Array<String> {
-                TODO("离线命令注册")
-            }
+    /**
+     * 检测到用户结束说话
+     */
+    fun onSpeechEnd(errCode: Int)
 
-            override fun onInitError(errMsg: String) {
-                TODO("开启失败：errMsg 错误信息")
-            }
+    /**
+     * 获取权限失败
+     */
+    fun onPermissionDenied()
 
-            override fun onASRError(errMsg: String) {
-                TODO("识别错误：errMsg 错误信息")
-            }
+    /**
+     * 语音指令回复结果 (success: 是否成功, isDialog: 是否为对话, audioPath: 音频文件存放路径)
+     */
+    fun onResponse(success: Boolean, isDialog: Boolean, audioPath: ArrayList<String>?)
 
-            override fun onPermissionDenied() {
-                TODO("权限不足")
-            }
+    /**
+     * asr识别过程中发生错误
+     */
+    fun onASRError(errMsg: String)
 
-            override fun onStartListening() {
-                TODO("正在聆听语音")
-            }
+    /**
+     * 初始化错误
+     */
+    fun onInitError(errMsg: String)
 
-            override fun onWakeup(): Boolean {
-                TODO("是否拦截唤醒后的操作：true 拦截 false不拦截；使用场景，根据需求动态控制语音响应，开启拦截语音唤醒后无响应")
-            }
+    /**
+     * 反初始化错误
+     */
+    fun onDeInitError(errMsg: String)
 
-            override fun onSpeechBeginning() {
-                TODO("用户正在说话")
-            }
+    /**
+     * 接收command
+     */
+    fun onCommand(command: String, data: String)
 
-            override fun onSpeechEnd(errCode: Int) {
-                TODO("用户说话结束")
-            }
-
-            override fun onResponse(success: Boolean, audioPath: ArrayList<String>) {
-                TODO("收到云端回复： success 是否成功回复；audioPath 回复音频文件的路径")
-            }
+    /**
+     * 需要注册命令时，返回命令字符串数组
+     */
+    fun getCommands(): Array<String>
         }, 8000)
 ```
 
 ### 绑定
-SpeechHelper 与中控 SDK 通过接口绑定，打通语音上传云端逻辑。
+SpeechHelper 与语音通道SDK 通过接口绑定，打通语音上传云端逻辑。
 
 **接口说明** 
 
 ```java
-void setSpeechHandler(Handler speechHandler)
-```
-**参数说明**
-
-| 参数 |说明  |
-| --- | --- |
-| speechHandler | Handler|
-
-**示例代码**
-
-```kotlin
-TuyaIotGateway.getInstance().setSpeechHandler(helper?.getHandler())
+TuyaVoiceSdk.getInstance().init(SpeechHelper helper)
 ```
 
 ### 开启
@@ -714,7 +656,48 @@ void stop()
 
 > 可参考 demo 中的` SpeechTestActivity`
 
-## 语音通道接口
+
+## 语音通道SDK
+> 适合已经具备语音前端处理能力的使用者，SDK提供语音数据上传通道 & 云端回复接收。
+
+#### 获取语音SDK 实例
+
+**接口说明**
+
+```java
+mVoice = TuyaVoiceSdk.getInstance();
+```
+
+#### 语音SDK 初始化
+
+**接口说明**
+
+```java
+init(ISpeechHelper callback)
+```
+**参数说明**
+
+| 参数     | 说明                                                         |
+| -------- | ------------------------------------------------------------ |
+| ISpeechHelper      | 语音数据处理协议               |
+
+```java
+interface ISpeechHelper {
+
+    /**
+     * 收到云端媒体数据
+     * @param mediaAttributes 媒体数据结构
+     */
+    void onCloudMedia(MediaAttribute[] mediaAttributes);
+
+}
+
+class MediaAttribute {
+	public int mMediaType; //MEDIA_TYPE_MEDIA = 0 多媒体类型; MEDIA_TYPE_TTS = 1 TTS类型;MEDIA_TYPE_INVALD = 2 无效类型;
+	public String mUrl; //音频数据请求地址
+	public String mRequestBody; //音频数据请求参数
+}
+```
 
 ### 语音上报接口
 **接口说明** 
@@ -725,13 +708,16 @@ void stop()
 
 ```java
 //开启上传;返回值：0(成功)；其他(失败错误码)
-TuyaIotGateway.getInstance().tuyaIotUploadMediaStart();
+mVoice.voiceUploadMediaStart();
 
 //上传语音数据；参数buffer 音频数据;返回值：0(成功)；其他(失败错误码)
-TuyaIotGateway.getInstance().tuyaIotUploadMedia(byte[] buffer);
+mVoice.voiceUploadMediaUpload(byte[] data);
 
 //结束上传;返回值：0(成功)；其他(失败错误码)
-TuyaIotGateway.getInstance().tuyaIotUploadMediaStop();
+mVoice.voiceUploadMediaStop();
+
+//取消上传;返回值：0(成功)；其他(失败错误码)
+mVoice.voiceUploadMediaCancel();
 ```
 
 ### 语音回复数据接收
@@ -739,17 +725,8 @@ TuyaIotGateway.getInstance().tuyaIotUploadMediaStop();
 **接口说明**
 
 接收云端下发多媒体数据结构体，获取音频需要通过地址和参数请求音频数据流。
+详见ISpeechHelper.onCloudMedia回调。
 
-```java
-void onCloudMedia(TuyaIotGateway.MediaAttribute[] mediaAttributes);
-
-
-class TuyaIotGateway.MediaAttribute {
-	public int mMediaType; //MEDIA_TYPE_MEDIA = 0 多媒体类型; MEDIA_TYPE_TTS = 1 TTS类型;MEDIA_TYPE_INVALD = 2 无效类型;
-	public String mUrl; //音频数据请求地址
-	public String mRequestBody; //音频数据请求参数
-}
-```
 
 ## OTA 升级
 
@@ -757,7 +734,7 @@ class TuyaIotGateway.MediaAttribute {
 
 **接口说明**
 
-通过 TuyaIotGateway 单例设置回调实现
+通过 TuyaGatewaySdk 单例设置回调实现
 
 ```java
 void setUpgradeCallback(UpgradeEventCallback upgradeCallback);
