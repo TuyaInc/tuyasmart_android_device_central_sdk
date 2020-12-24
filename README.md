@@ -45,10 +45,8 @@ Android 设备 SDK 主要提供：
 1. 配置 build.gradle 文件
    app 的 build.gradle 文件dependencies 里添加依赖库。
    
-   **中控SDK 最新版本：**<img src="https://api.bintray.com/packages/tuyasmartai/sdk/tuyasmart-lego_sdk_CENTRAL/images/download.svg"/>
-   
    ```groovy
-   implementation 'com.tuya.smart:tuyasmart-lego_sdk_CENTRAL:x.x.x'
+   implementation 'com.tuya.smart:tuyasmart-lego_sdk_CENTRAL:0.0.8-central-1-rc.1'
    ```
    
    **使用到的三方依赖**
