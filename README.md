@@ -69,6 +69,21 @@ Android 设备 SDK 主要提供：
    jcenter()
    maven { url 'https://dl.bintray.com/tuyasmartai/sdk' }
    ```
+3. 权限要求：
+
+   ```groovy
+   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.READ_PHONE_STATE"
+        android:required="false" /> <!-- 网络 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+   ```
+
 
 ## 网关控制
 
