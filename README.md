@@ -158,7 +158,7 @@ GatewayConfig.class
 | mUUID        | 设备唯一，成对出现                                           |
 | mAuthKey     | authkey，向涂鸦申请，设备唯一，和mUUID成对出现               |
 | mVersion     | 版本号，用于标识app 版本，而不是网关版本                     |
-| mSerialPort  | 串口终端                                                 |
+| mSerialPort  | 串口终端（zigbee模组连接的串口号，根据板子实际焊接情况填写。）  |
 | mTempDir     | 临时文件目录，该目录要在app中创建                         |
 | mBinDir      | bin文件目录，该文件夹下不要存放其他文件，该目录要在app中创建 |
 | mIsCTS       | 是否带流控                                                 |
