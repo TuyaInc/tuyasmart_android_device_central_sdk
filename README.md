@@ -389,7 +389,7 @@ public int tuyaIotReportDataPointJsonAsync(String devId, DataPoint[] dataPoint);
 
 | 参数      | 说明                                                         |
 | --------- | ------------------------------------------------------------ |
-| devId     | 如果是主设备，devId 是自设备 id；如果是网关 /soc/mcu，则 devId 为 null |
+| devId     | 如果是子设备，devId 是子设备 id；如果是网关/soc/mcu，则 devId 为 null |
 | dataPoint | dp 点信息，参考 TuyaGatewaySdk.DataPoint                     |
 
 TuyaGatewaySdk.DataPoint
@@ -413,7 +413,7 @@ public int tuyaIotReportDataPointRawSync(String devId, int dataPointId, byte[] d
 
 | 返回值      | 含义                                                         |
 | ----------- | ------------------------------------------------------------ |
-| devId       | 如果是主设备，devId 是自设备 id；如果是网关 /soc/mcu，则 devId 为 null |
+| devId       | 如果是子设备，devId 是子设备 id；如果是网关/soc/mcu，则 devId 为 null |
 | dataPointId | 在涂鸦 IoT 平台上定义的功能点编号                            |
 | data        | 透传型 dp 点数据                                             |
 | timeout     | 函数阻塞超时时间，以秒为单位                                 |
